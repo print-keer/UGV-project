@@ -16,6 +16,8 @@ from algorithms.astar_slam import AStarSLAM
 from algorithms.rrt_slam import RRTSLAM
 from algorithms.gat_pathfinder import GATPathfinder
 from algorithms.dijkstra_algorithm import DijkstraPathfinder
+from algorithms.prm_algorithm import PRMPathfinder
+from algorithms.hybrid_astar import HybridAStar
 from environment.environment_generator import EnvironmentGenerator
 from utils.performance_analyzer import PerformanceAnalyzer
 
@@ -30,7 +32,8 @@ class FastPathfindingComparison:
             'Simple': 'simple_obstacles',
             'Maze': 'complex_maze', 
             'Cluttered': 'cluttered_space',
-            'Dynamic': 'dynamic_obstacles'
+            'Dynamic': 'dynamic_obstacles',
+            'Terrain': 'multi_level_terrain'
         }
         
         self.performance_analyzer = PerformanceAnalyzer()
@@ -50,7 +53,9 @@ class FastPathfindingComparison:
             'A* + SLAM': AStarSLAM,
             'RRT + SLAM': RRTSLAM, 
             'GAT Pathfinder': GATPathfinder,
-            'Dijkstra': DijkstraPathfinder
+            'Dijkstra': DijkstraPathfinder,
+            'PRM': PRMPathfinder,
+            'Hybrid A*': HybridAStar
         }
         
         for name, AlgClass in algorithm_classes.items():
@@ -643,3 +648,4 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"System error: {e}")
         print("Please check that all required files are present")
+
