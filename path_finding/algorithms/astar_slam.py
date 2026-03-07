@@ -32,7 +32,6 @@ class AStarSLAM:
         f_score[grid_start] = self.heuristic(grid_start, grid_goal)
         
         explored_nodes = 0
-        path_nodes = []
         
         while open_set:
             current_f, current = heapq.heappop(open_set)
@@ -84,38 +83,25 @@ class AStarSLAM:
         return None, metrics
     
     def world_to_grid(self, pos):
-        """Convert world coordinates to grid coordinates"""
         return (int(pos[0] / self.grid_resolution), int(pos[1] / self.grid_resolution))
     
     def grid_to_world(self, grid_pos):
-        """Convert grid coordinates to world coordinates"""
         return np.array([grid_pos[0] * self.grid_resolution, grid_pos[1] * self.grid_resolution])
     
     def create_occupancy_grid(self, obstacles, slam_data):
-        """Create occupancy grid with SLAM uncertainty"""
-        # Determine grid bounds
         all_points = obstacles
         if len(all_points) == 0:
             return {}
         
-        min_x = int(np.min(all_points[:, 0]) / self.grid_resolution) - 5
-        max_x = int(np.max(all_points[:, 0]) / self.grid_resolution) + 5
-        min_y = int(np.min(all_points[:, 1]) / self.grid_resolution) - 5
-        max_y = int(np.max(all_points[:, 1]) / self.grid_resolution) + 5
-        
         occupancy_grid = {}
-        
-        # Mark obstacle cells
         for obstacle in obstacles:
             grid_pos = self.world_to_grid(obstacle)
-            # Add robot radius buffer
             for dx in range(-2, 3):
                 for dy in range(-2, 3):
-                    if dx*dx + dy*dy <= 4:  # Circular buffer
+                    if dx*dx + dy*dy <= 4:
                         cell = (grid_pos[0] + dx, grid_pos[1] + dy)
                         occupancy_grid[cell] = 1.0
         
-        # Add SLAM uncertainty
         if slam_data:
             for cell in occupancy_grid:
                 uncertainty = slam_data.get('uncertainty', {}).get(cell, 0)
@@ -124,45 +110,32 @@ class AStarSLAM:
         return occupancy_grid
     
     def is_valid_cell(self, cell, occupancy_grid):
-        """Check if cell is valid (not occupied)"""
         return occupancy_grid.get(cell, 0) < 0.5
     
     def get_neighbors(self, cell):
-        """Get neighboring cells (8-connected)"""
         x, y = cell
-        neighbors = []
-        for dx in [-1, 0, 1]:
-            for dy in [-1, 0, 1]:
-                if dx == 0 and dy == 0:
-                    continue
-                neighbors.append((x + dx, y + dy))
-        return neighbors
+        return [(x+dx, y+dy) for dx in [-1, 0, 1] for dy in [-1, 0, 1] if not (dx == 0 and dy == 0)]
     
     def distance(self, cell1, cell2):
-        """Calculate distance between cells"""
         dx = cell1[0] - cell2[0]
         dy = cell1[1] - cell2[1]
         return math.sqrt(dx*dx + dy*dy)
     
     def heuristic(self, cell, goal):
-        """A* heuristic (Euclidean distance)"""
         return self.distance(cell, goal)
     
     def get_slam_cost(self, cell, slam_data):
-        """Get additional cost based on SLAM uncertainty"""
         if not slam_data:
             return 0
         uncertainty = slam_data.get('uncertainty', {}).get(cell, 0)
-        return uncertainty * 2.0  # Penalty for uncertain areas
+        return uncertainty * 2.0
     
     def calculate_path_length(self, path):
-        """Calculate total path length"""
         if len(path) < 2:
             return 0
         return np.sum(np.linalg.norm(np.diff(path, axis=0), axis=1))
     
     def calculate_smoothness(self, path):
-        """Calculate path smoothness"""
         if len(path) < 3:
             return 0
         
@@ -174,3 +147,24 @@ class AStarSLAM:
             angles.append(angle)
         
         return np.std(angles) if angles else 0
+
+
+def run_algorithm(start, goal, obstacles, slam_data=None, visualize=False):
+    try:
+        algo = AStarSLAM()
+        path, metrics = algo.find_path(start, goal, obstacles, slam_data)
+        
+        if visualize:
+            import matplotlib.pyplot as plt
+            if path is not None:
+                plt.plot(path[:, 0], path[:, 1], '-r')
+                plt.scatter(obstacles[:, 0], obstacles[:, 1], s=10, c='k')
+                plt.scatter(start[0], start[1], c='g', label='Start')
+                plt.scatter(goal[0], goal[1], c='b', label='Goal')
+                plt.legend()
+                plt.show(block=False)
+                plt.pause(0.1)
+        return path, metrics
+    except Exception as e:
+        print(f"[ERROR] {__name__} failed: {e}")
+        return None, {'error': str(e)}

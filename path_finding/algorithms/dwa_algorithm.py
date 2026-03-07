@@ -1,13 +1,19 @@
+"""
+Dynamic Window Approach (DWA) Algorithm
+Optimized for integration with GUI-based pathfinding systems.
+"""
+
 import math
 from enum import Enum
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 
-show_animation = True
 
 class RobotType(Enum):
     circle = 0
     rectangle = 1
+
 
 class Config:
     """ Simulation parameter class """
@@ -20,23 +26,17 @@ class Config:
         self.max_delta_yaw_rate = 40.0 * math.pi / 180.0  # [rad/s²]
         self.v_resolution = 0.01  # [m/s]
         self.yaw_rate_resolution = 0.1 * math.pi / 180.0  # [rad/s]
-        self.dt = 0.1  # [s] Time step
+        self.dt = 0.1  # [s]
         self.predict_time = 3.0  # [s]
         self.to_goal_cost_gain = 0.15
         self.speed_cost_gain = 1.0
         self.obstacle_cost_gain = 1.0
-        self.robot_stuck_flag_cons = 0.001  # To avoid getting stuck
+        self.robot_stuck_flag_cons = 0.001
         self.robot_type = RobotType.circle
-        self.robot_radius = 1.0  # [m]
-        self.robot_width = 0.5   # [m]
-        self.robot_length = 1.2  # [m]
+        self.robot_radius = 1.0
+        self.robot_width = 0.5
+        self.robot_length = 1.2
 
-        # Predefined obstacle positions [x, y]
-        self.ob = np.array([
-            [-1, -1], [0, 2], [4.0, 2.0], [5.0, 4.0], [5.0, 5.0],
-            [5.0, 6.0], [5.0, 9.0], [8.0, 9.0], [7.0, 9.0], [8.0, 10.0],
-            [9.0, 11.0], [12.0, 13.0], [12.0, 12.0], [15.0, 15.0], [13.0, 13.0]
-        ])
 
 def motion(x, u, dt):
     """ Motion model """
@@ -46,6 +46,7 @@ def motion(x, u, dt):
     x[3] = u[0]
     x[4] = u[1]
     return x
+
 
 def calc_dynamic_window(x, config):
     """ Calculate dynamic window based on current state """
@@ -61,16 +62,18 @@ def calc_dynamic_window(x, config):
           max(Vs[2], Vd[2]), min(Vs[3], Vd[3])]
     return dw
 
+
 def predict_trajectory(x_init, v, y, config):
     """ Predict trajectory given velocity and yaw rate """
     x = np.array(x_init)
     trajectory = np.array(x)
-    time = 0
-    while time <= config.predict_time:
+    time_ = 0
+    while time_ <= config.predict_time:
         x = motion(x, [v, y], config.dt)
         trajectory = np.vstack((trajectory, x))
-        time += config.dt
+        time_ += config.dt
     return trajectory
+
 
 def calc_to_goal_cost(trajectory, goal):
     """ Calculate cost based on distance to goal """
@@ -79,6 +82,7 @@ def calc_to_goal_cost(trajectory, goal):
     error_angle = math.atan2(dy, dx)
     cost_angle = error_angle - trajectory[-1, 2]
     return abs(math.atan2(math.sin(cost_angle), math.cos(cost_angle)))
+
 
 def calc_obstacle_cost(trajectory, ob, config):
     """ Calculate obstacle cost (infinite if collision occurs) """
@@ -109,6 +113,7 @@ def calc_obstacle_cost(trajectory, ob, config):
     min_r = np.min(r)
     return 1.0 / min_r
 
+
 def calc_control_and_trajectory(x, dw, config, goal, ob):
     """ Evaluate trajectories and select best control input """
     x_init = x[:]
@@ -131,13 +136,16 @@ def calc_control_and_trajectory(x, dw, config, goal, ob):
                     best_u[1] = -config.max_delta_yaw_rate
     return best_u, best_trajectory
 
+
 def dwa_control(x, config, goal, ob):
     """ Main Dynamic Window Approach control """
     dw = calc_dynamic_window(x, config)
     u, trajectory = calc_control_and_trajectory(x, dw, config, goal, ob)
     return u, trajectory
 
+
 def plot_robot(x, y, yaw, config):
+    """Draw robot shape"""
     if config.robot_type == RobotType.rectangle:
         outline = np.array([[-config.robot_length / 2, config.robot_length / 2,
                              config.robot_length / 2, -config.robot_length / 2,
@@ -150,50 +158,75 @@ def plot_robot(x, y, yaw, config):
         outline = (outline.T.dot(Rot1)).T
         outline[0, :] += x
         outline[1, :] += y
-        plt.plot(np.array(outline[0, :]).flatten(),
-                 np.array(outline[1, :]).flatten(), "-k")
+        plt.plot(outline[0, :], outline[1, :], "-k")
     elif config.robot_type == RobotType.circle:
-        circle = plt.Circle((x, y), config.robot_radius, color="b")
-        plt.gcf().gca().add_artist(circle)
+        circle = plt.Circle((x, y), config.robot_radius, color="b", fill=False)
+        plt.gca().add_artist(circle)
         out_x, out_y = (np.array([x, y]) +
                         np.array([np.cos(yaw), np.sin(yaw)]) * config.robot_radius)
         plt.plot([x, out_x], [y, out_y], "-k")
 
-def main(gx=10.0, gy=10.0, robot_type=RobotType.circle):
-    print("Starting DWA Simulation...")
-    config = Config()
-    config.robot_type = robot_type
 
-    # Initial state [x, y, yaw, v, omega]
-    x = np.array([0.0, 0.0, math.pi / 8.0, 0.0, 0.0])
-    goal = np.array([gx, gy])
-    trajectory = np.array(x)
-    ob = config.ob
+def run_algorithm(start, goal, obstacles, slam_data=None, visualize=False):
+    """
+    Unified entry point for DWA for GUI and analysis modules.
+    """
+    try:
+        config = Config()
+        x = np.array([start[0], start[1], 0.0, 0.0, 0.0])  # [x, y, yaw, v, omega]
+        goal = np.array(goal)
+        ob = np.array(obstacles)
+        trajectory = np.array(x)
+        iterations = 0
+        start_time = time.time()
 
-    while True:
-        u, predicted_trajectory = dwa_control(x, config, goal, ob)
-        x = motion(x, u, config.dt)
-        trajectory = np.vstack((trajectory, x))
+        while True:
+            u, predicted_trajectory = dwa_control(x, config, goal, ob)
+            x = motion(x, u, config.dt)
+            trajectory = np.vstack((trajectory, x))
+            iterations += 1
 
-        if show_animation:
-            plt.cla()
-            plt.plot(predicted_trajectory[:, 0], predicted_trajectory[:, 1], "-g")
-            plt.plot(x[0], x[1], "xr")
-            plt.plot(goal[0], goal[1], "xb")
-            plt.plot(ob[:, 0], ob[:, 1], "ok")
-            plot_robot(x[0], x[1], x[2], config)
-            plt.axis("equal")
-            plt.grid(True)
-            plt.pause(0.0001)
+            dist_to_goal = math.hypot(x[0] - goal[0], x[1] - goal[1])
 
-        # Goal check
-        dist_to_goal = math.hypot(x[0] - goal[0], x[1] - goal[1])
-        if dist_to_goal <= config.robot_radius:
-            print("Goal Reached!")
-            break
+            if visualize and iterations % 10 == 0:
+                plt.cla()
+                plt.plot(predicted_trajectory[:, 0], predicted_trajectory[:, 1], "-g")
+                plt.plot(trajectory[:, 0], trajectory[:, 1], "-r")
+                plt.plot(ob[:, 0], ob[:, 1], "ok")
+                plt.scatter(goal[0], goal[1], c='b', label='Goal')
+                plot_robot(x[0], x[1], x[2], config)
+                plt.axis("equal")
+                plt.grid(True)
+                plt.pause(0.001)
 
-    plt.plot(trajectory[:, 0], trajectory[:, 1], "-r")
-    plt.show()
+            # Exit conditions
+            if dist_to_goal <= config.robot_radius or iterations > 1000:
+                break
 
-if __name__ == '__main__':
-    main(gx=11.0, gy=14.0, robot_type=RobotType.rectangle)
+        metrics = {
+            'path_length': np.sum(np.linalg.norm(np.diff(trajectory[:, :2], axis=0), axis=1)),
+            'iterations': iterations,
+            'success_rate': 1.0 if dist_to_goal <= config.robot_radius else 0.0,
+            'execution_time': time.time() - start_time,
+            'smoothness': np.std(np.diff(trajectory[:, 2])) if len(trajectory) > 2 else 0,
+        }
+
+        if visualize:
+            plt.plot(trajectory[:, 0], trajectory[:, 1], "-r")
+            plt.title("DWA Path")
+            plt.show(block=False)
+            plt.pause(0.1)
+
+        return trajectory[:, :2], metrics
+
+    except Exception as e:
+        print(f"[ERROR] {__name__} failed: {e}")
+        return None, {'error': str(e)}
+
+
+# For standalone testing
+if __name__ == "__main__":
+    start = np.array([0.0, 0.0])
+    goal = np.array([10.0, 10.0])
+    obstacles = np.array([[3, 3], [6, 6], [7, 5]])
+    run_algorithm(start, goal, obstacles, visualize=True)

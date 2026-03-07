@@ -150,3 +150,24 @@ class DijkstraPathfinder:
                 angles.append(angle)
         
         return np.std(angles) if angles else 0
+    
+def run_algorithm(start, goal, obstacles, slam_data=None, visualize=False):
+    try:
+        algo = DijkstraPathfinder()   
+        path, metrics = algo.find_path(start, goal, obstacles, slam_data)
+        
+        if visualize:
+            import matplotlib.pyplot as plt
+            if path is not None:
+                plt.plot(path[:, 0], path[:, 1], '-r')
+                plt.scatter(obstacles[:, 0], obstacles[:, 1], s=10, c='k')
+                plt.scatter(start[0], start[1], c='g', label='Start')
+                plt.scatter(goal[0], goal[1], c='b', label='Goal')
+                plt.legend()
+                plt.show(block=False)
+                plt.pause(0.1)
+        return path, metrics
+    except Exception as e:
+        print(f"[ERROR] {__name__} failed: {e}")
+        return None, {'error': str(e)}
+
