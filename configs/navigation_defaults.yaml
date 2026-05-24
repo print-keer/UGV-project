@@ -1,0 +1,9 @@
+planner:
+  occupancy:
+    free: 0
+    obstacle: 1
+    unknown: 2
+  allow_unknown_cells: true
+  straight_step_cost: 1.0
+  unknown_cell_penalty: 4.0
+

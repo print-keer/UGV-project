@@ -1,0 +1,15 @@
+{
+  "name": "map_corridor",
+  "description": "Obstacle corridor used to validate detours around blocked cells.",
+  "start": [0, 0],
+  "goal": [5, 5],
+  "grid": [
+    [0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 1, 0],
+    [0, 1, 1, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 0]
+  ]
+}
+
