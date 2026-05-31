@@ -1,7 +1,7 @@
 from setuptools import setup
 
 
-package_name = "mission_controller"
+package_name = "autonomy_interfaces"
 
 
 setup(
@@ -11,18 +11,12 @@ setup(
     data_files=[
         ("share/ament_index/resource_index/packages", [f"resource/{package_name}"]),
         (f"share/{package_name}", ["package.xml"]),
-        (f"share/{package_name}/launch", ["launch/person1_stack.launch.py"]),
     ],
     install_requires=["setuptools"],
     zip_safe=True,
     maintainer="UGV Team",
     maintainer_email="maintainer@example.com",
-    description="UGV mission controller package.",
+    description="Shared UGV autonomy interface contracts.",
     license="MIT",
-    entry_points={
-        "console_scripts": [
-            "mission_demo = mission_controller.demo:main",
-            "mission_controller_node = mission_controller.mission_controller_node:main",
-        ]
-    },
 )
+
