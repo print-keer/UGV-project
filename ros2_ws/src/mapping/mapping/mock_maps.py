@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Tuple
 
@@ -13,6 +13,7 @@ class MockMap:
     start: Tuple[int, int]
     goal: Tuple[int, int]
     grid: List[List[int]]
+    dynamic_obstacles: List[Tuple[int, int]] = field(default_factory=list)
 
 
 def load_mock_map(map_path: Path) -> MockMap:
@@ -23,6 +24,7 @@ def load_mock_map(map_path: Path) -> MockMap:
         start=tuple(payload["start"]),
         goal=tuple(payload["goal"]),
         grid=payload["grid"],
+        dynamic_obstacles=[tuple(cell) for cell in payload.get("dynamic_obstacles", [])],
     )
 
 
@@ -32,4 +34,3 @@ def load_all_mock_maps(maps_dir: Path) -> Dict[str, MockMap]:
         mock_map = load_mock_map(map_path)
         maps[mock_map.name] = mock_map
     return maps
-

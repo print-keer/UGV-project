@@ -1,15 +1,13 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>navigation</name>
+  <name>autonomy_interfaces</name>
   <version>0.1.0</version>
-  <description>UGV navigation package for consuming planned paths.</description>
+  <description>Shared Person 1 interface contracts for the UGV autonomy pipeline.</description>
   <maintainer email="maintainer@example.com">UGV Team</maintainer>
   <license>MIT</license>
   <buildtool_depend>ament_python</buildtool_depend>
-  <exec_depend>rclpy</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
-  <exec_depend>autonomy_msgs</exec_depend>
   <export>
     <build_type>ament_python</build_type>
   </export>
 </package>
+
