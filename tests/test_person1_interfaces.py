@@ -14,6 +14,7 @@ from autonomy_interfaces.contracts import (
     NAV_BLOCKED,
     PLANNER_NO_PATH,
     PLANNER_SUCCESS,
+    MotionCommandMessage,
     REPLAN_EMPTY_PATH,
     REPLAN_NO_PATH_RECOVERY,
     REPLAN_PATH_BLOCKED,
@@ -75,6 +76,12 @@ class Person1InterfaceTests(unittest.TestCase):
         self.assertTrue(execution.planned_path.path_found)
         self.assertEqual(execution.navigation_status.goal_id, mock_map.name)
         self.assertIsNone(execution.replan_request)
+        self.assertTrue(execution.navigation_execution.reached_goal)
+        self.assertEqual(execution.navigation_execution.steps[-1].current_cell, mock_map.goal)
+        self.assertTrue(execution.navigation_execution.motion_commands)
+        self.assertTrue(execution.navigation_execution.motion_commands[-1].stop)
+        self.assertEqual(len(execution.motor_statuses), len(execution.navigation_execution.motion_commands))
+        self.assertTrue(all(status.applied for status in execution.motor_statuses))
 
     def test_navigation_requests_replan_when_path_is_empty(self) -> None:
         follower = PathFollower()
@@ -123,6 +130,7 @@ class Person1InterfaceTests(unittest.TestCase):
             execution.final_execution.planned_path.waypoints,
         )
         self.assertIn("/navigation/replan_request", execution.published_topics)
+        self.assertIn("/motor/status", execution.published_topics)
 
     def test_blocked_waypoint_report_uses_path_blocked_reason(self) -> None:
         follower = PathFollower()
@@ -138,6 +146,7 @@ class Person1InterfaceTests(unittest.TestCase):
 
         self.assertFalse(report.accepted)
         self.assertEqual(report.replan_request.reason, REPLAN_PATH_BLOCKED)
+        self.assertEqual(report.status.current_waypoint_index, 1)
 
     def test_dynamic_world_execution_generates_multiple_revisions(self) -> None:
         mock_map = MockMap(
@@ -159,6 +168,7 @@ class Person1InterfaceTests(unittest.TestCase):
         self.assertEqual([step.occupancy_revision for step in execution.steps], [0, 1, 2])
         self.assertTrue(execution.steps[0].path_found)
         self.assertTrue(any(not step.path_found for step in execution.steps[1:]))
+        self.assertTrue(execution.steps[0].reached_goal)
 
     def test_dynamic_world_reports_terminal_no_path_state(self) -> None:
         mock_map = MockMap(
@@ -177,6 +187,41 @@ class Person1InterfaceTests(unittest.TestCase):
 
         self.assertEqual(execution.terminal_state, PLANNER_NO_PATH)
         self.assertEqual(execution.steps[-1].recovery_action, "hold_position_and_report_no_path")
+        self.assertFalse(execution.steps[-1].reached_goal)
+
+    def test_navigation_execution_tracks_waypoint_progress(self) -> None:
+        follower = PathFollower()
+        execution = follower.follow_path(
+            PlannedPathMessage(
+                path_found=True,
+                waypoints=[(0, 0), (0, 1), (1, 1)],
+                total_cost=2.0,
+                goal_id="progress_goal",
+            )
+        )
+
+        self.assertTrue(execution.reached_goal)
+        self.assertEqual([step.current_cell for step in execution.steps], [(0, 0), (0, 1), (1, 1)])
+        self.assertEqual(execution.report.status.current_waypoint_index, 2)
+        self.assertEqual(
+            [command.command_type for command in execution.motion_commands],
+            ["step_to_cell", "step_to_cell", "stop_at_goal"],
+        )
+
+    def test_empty_path_generates_hold_position_command(self) -> None:
+        follower = PathFollower()
+        execution = follower.follow_path(
+            PlannedPathMessage(
+                path_found=False,
+                waypoints=[],
+                total_cost=0.0,
+                goal_id="hold_goal",
+            )
+        )
+
+        self.assertEqual(len(execution.motion_commands), 1)
+        self.assertEqual(execution.motion_commands[0].command_type, "hold_position")
+        self.assertTrue(execution.motion_commands[0].stop)
 
 
 if __name__ == "__main__":

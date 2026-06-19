@@ -21,7 +21,9 @@ setup(
     entry_points={
         "console_scripts": [
             "mock_map_node = mapping.mock_map_node:main",
+            "sensor_simulator_node = mapping.sensor_simulator_node:main",
+            "lidar_adapter_node = mapping.live_sensor_adapters:lidar_adapter_main",
+            "ultrasonic_adapter_node = mapping.live_sensor_adapters:ultrasonic_adapter_main",
         ]
     },
 )
-

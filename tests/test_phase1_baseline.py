@@ -24,6 +24,33 @@ class Phase1BaselineTests(unittest.TestCase):
             / "person1_stack.launch.py"
         )
         self.assertTrue(launch_path.exists())
+        viz_launch_path = (
+            repo_root
+            / "ros2_ws"
+            / "src"
+            / "mission_controller"
+            / "launch"
+            / "person1_visualization.launch.py"
+        )
+        self.assertTrue(viz_launch_path.exists())
+        observe_launch_path = (
+            repo_root
+            / "ros2_ws"
+            / "src"
+            / "mission_controller"
+            / "launch"
+            / "person1_observe.launch.py"
+        )
+        self.assertTrue(observe_launch_path.exists())
+        rviz_config_path = (
+            repo_root
+            / "ros2_ws"
+            / "src"
+            / "mission_controller"
+            / "rviz"
+            / "person1_navigation.rviz"
+        )
+        self.assertTrue(rviz_config_path.exists())
 
     def test_phase1_periods_are_positive_and_consistent(self) -> None:
         self.assertGreater(MISSION_GOAL_PERIOD_SEC, 0.0)

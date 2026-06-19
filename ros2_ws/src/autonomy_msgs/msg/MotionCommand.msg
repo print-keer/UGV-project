@@ -1,0 +1,9 @@
+string command_type
+bool has_target_cell
+int32 target_row
+int32 target_col
+float32 linear_velocity
+float32 angular_velocity
+bool stop
+string goal_id
+uint32 sequence_id

@@ -11,7 +11,7 @@ autonomous UGV with three primary engineering lanes:
 
 - autonomy and navigation
 - AI perception and threat classification
-- hardware and embedded integration
+- hardware assembly and platform enablement
 
 The system is being developed in stages, beginning with simulation-first
 validation and then expanding toward ROS2 integration and physical deployment.
@@ -33,14 +33,20 @@ inference, or threat-aware route weighting yet.
 ## Recommended team ownership
 
 - Person 1 should work mainly in `autonomy/`, `ros2_ws/src/navigation/`,
-  `ros2_ws/src/path_planner/`, `ros2_ws/src/mapping/`, and `simulation/`
+  `ros2_ws/src/path_planner/`, `ros2_ws/src/mapping/`,
+  `ros2_ws/src/mission_controller/`, `ros2_ws/src/autonomy_interfaces/`,
+  `ros2_ws/src/autonomy_msgs/`, and `simulation/`
 - Person 2 should work mainly in `ai/`, `ros2_ws/src/vision/`, and
   `ros2_ws/src/threat_detection/`
-- Person 3 should work mainly in `firmware/`, `hardware/`, and
-  `ros2_ws/src/hardware_interface/`
+- Person 3 should work mainly in `firmware/`, `hardware/`, and hardware-facing
+  setup docs and checklists
 
 This keeps the repo modular and reduces merge conflicts while the subsystems are
 still evolving independently.
+
+In the updated split, Person 1 and Person 2 own the code implementation.
+Person 3 owns the physical robot assembly, Raspberry Pi bring-up, wiring,
+mounting, and hardware readiness for software testing.
 
 ## Shared technical direction
 
@@ -54,6 +60,7 @@ still evolving independently.
 ## Useful starting points
 
 - [README.md](/D:/Projects/UGV_FINAL/UGV-project/README.md): project-level overview
+- [revised_execution_plan.md](/D:/Projects/UGV_FINAL/UGV-project/docs/revised_execution_plan.md): updated role split, phases, dependencies, and handoffs
 - [navigation_foundation.md](/D:/Projects/UGV_FINAL/UGV-project/docs/navigation_foundation.md): current milestone details
 - [ugv_master_implementation.md](/D:/Projects/UGV_FINAL/UGV-project/Theory/ugv_master_implementation.md): master project theory
 - [ugv_work_division.md](/D:/Projects/UGV_FINAL/UGV-project/Theory/ugv_work_division.md): team-based work split

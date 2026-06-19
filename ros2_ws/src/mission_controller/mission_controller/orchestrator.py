@@ -5,6 +5,7 @@ from typing import Optional
 
 from autonomy_interfaces.contracts import (
     MissionGoalMessage,
+    MotorStatusMessage,
     PLANNER_NO_PATH,
     NavigationStatusMessage,
     OccupancyGridMessage,
@@ -15,11 +16,16 @@ from autonomy_interfaces.contracts import (
 from mapping.dynamic_world import DynamicWorld
 from mapping.mock_maps import MockMap
 from mapping.map_provider import MapProvider
+from motor_controller.driver_stub import MotorDriverStub
+from navigation.motion_adapter import to_motor_control_command
 from navigation.path_follower import NavigationReport, PathFollower
+from navigation.path_follower import NavigationExecution
 from path_planner.planning_pipeline import PlanningPipeline
 from .topic_bus import TopicBus
 from .topics import (
     MISSION_GOAL_TOPIC,
+    MOTOR_STATUS_TOPIC,
+    MOTION_COMMAND_TOPIC,
     NAVIGATION_STATUS_TOPIC,
     OCCUPANCY_GRID_TOPIC,
     PLANNED_PATH_TOPIC,
@@ -37,6 +43,8 @@ class MissionExecution:
     navigation_status: NavigationStatusMessage
     replan_request: Optional[ReplanRequestMessage]
     navigation_report: NavigationReport
+    navigation_execution: NavigationExecution
+    motor_statuses: list[MotorStatusMessage]
 
 
 @dataclass(frozen=True)
@@ -56,6 +64,8 @@ class DynamicMissionStep:
     path: list[tuple[int, int]]
     applied_obstacle: tuple[int, int] | None = None
     recovery_action: str | None = None
+    progress_steps: int = 0
+    reached_goal: bool = False
 
 
 @dataclass(frozen=True)
@@ -74,10 +84,12 @@ class MissionOrchestrator:
         planning_pipeline: PlanningPipeline | None = None,
         path_follower: PathFollower | None = None,
         map_provider: MapProvider | None = None,
+        motor_driver: MotorDriverStub | None = None,
     ) -> None:
         self.planning_pipeline = planning_pipeline or PlanningPipeline()
         self.path_follower = path_follower or PathFollower()
         self.map_provider = map_provider or MapProvider()
+        self.motor_driver = motor_driver or MotorDriverStub()
 
     def execute(
         self,
@@ -89,14 +101,21 @@ class MissionOrchestrator:
             mission_goal,
         )
         navigation_report = self.path_follower.consume_path(planned_path)
+        navigation_execution = self.path_follower.follow_path(planned_path)
+        motor_statuses = [
+            self.motor_driver.apply(to_motor_control_command(command))
+            for command in navigation_execution.motion_commands
+        ]
         return MissionExecution(
             occupancy_grid=occupancy_grid,
             mission_goal=mission_goal,
             planned_path=planned_path,
             planner_status=planner_status,
-            navigation_status=navigation_report.status,
-            replan_request=navigation_report.replan_request,
-            navigation_report=navigation_report,
+            navigation_status=navigation_execution.report.status,
+            replan_request=navigation_execution.report.replan_request,
+            navigation_report=navigation_execution.report,
+            navigation_execution=navigation_execution,
+            motor_statuses=motor_statuses,
         )
 
     def recover_no_path(
@@ -135,9 +154,14 @@ class MissionOrchestrator:
         def on_path(path: PlannedPathMessage) -> None:
             navigation_messages["path"] = path
 
+        def on_motion_command(command) -> None:
+            status = self.motor_driver.apply(to_motor_control_command(command))
+            bus.publish(MOTOR_STATUS_TOPIC, status)
+
         bus.subscribe(MISSION_GOAL_TOPIC, on_goal)
         bus.subscribe(OCCUPANCY_GRID_TOPIC, on_grid)
         bus.subscribe(PLANNED_PATH_TOPIC, on_path)
+        bus.subscribe(MOTION_COMMAND_TOPIC, on_motion_command)
 
         bus.publish(OCCUPANCY_GRID_TOPIC, latest_grid)
         bus.publish(MISSION_GOAL_TOPIC, latest_goal)
@@ -146,6 +170,8 @@ class MissionOrchestrator:
         bus.publish(PLANNER_STATUS_TOPIC, initial_execution.planner_status)
         bus.publish(PLANNED_PATH_TOPIC, initial_execution.planned_path)
         bus.publish(NAVIGATION_STATUS_TOPIC, initial_execution.navigation_status)
+        for command in initial_execution.navigation_execution.motion_commands:
+            bus.publish(MOTION_COMMAND_TOPIC, command)
 
         final_execution = initial_execution
         replanned = False
@@ -172,6 +198,8 @@ class MissionOrchestrator:
                 bus.publish(PLANNER_STATUS_TOPIC, final_execution.planner_status)
                 bus.publish(PLANNED_PATH_TOPIC, final_execution.planned_path)
                 bus.publish(NAVIGATION_STATUS_TOPIC, final_execution.navigation_status)
+                for command in final_execution.navigation_execution.motion_commands:
+                    bus.publish(MOTION_COMMAND_TOPIC, command)
                 replanned = True
 
         return TopicMissionExecution(
@@ -201,6 +229,8 @@ class MissionOrchestrator:
                 navigation_state=initial_execution.navigation_status.state,
                 path_found=initial_execution.planned_path.path_found,
                 path=initial_execution.planned_path.waypoints,
+                progress_steps=len(initial_execution.navigation_execution.steps),
+                reached_goal=initial_execution.navigation_execution.reached_goal,
             )
         )
 
@@ -220,6 +250,8 @@ class MissionOrchestrator:
                     path=current_execution.planned_path.waypoints,
                     applied_obstacle=world_step.applied_obstacle,
                     recovery_action=recovery_action,
+                    progress_steps=len(current_execution.navigation_execution.steps),
+                    reached_goal=current_execution.navigation_execution.reached_goal,
                 )
             )
             total_replans += 1

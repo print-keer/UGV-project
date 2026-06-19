@@ -22,6 +22,7 @@ REPLAN_GOAL_CHANGED = "goal_changed"
 REPLAN_MAP_UPDATED = "map_updated"
 REPLAN_EMPTY_PATH = "empty_path"
 REPLAN_NO_PATH_RECOVERY = "no_path_recovery"
+REPLAN_SENSOR_UPDATE = "sensor_update"
 
 
 @dataclass(frozen=True)
@@ -87,6 +88,54 @@ class ReplanRequestMessage:
     current_cell: Optional[GridCell] = None
     goal_id: str = "default_goal"
     occupancy_revision: int = 0
+
+
+@dataclass(frozen=True)
+class SensorObservationMessage:
+    sensor_type: str
+    detected_cells: List[GridCell] = field(default_factory=list)
+    source_map: str = ""
+    sequence_id: int = 0
+
+
+@dataclass(frozen=True)
+class MotionCommandMessage:
+    command_type: str
+    target_cell: Optional[GridCell] = None
+    linear_velocity: float = 0.0
+    angular_velocity: float = 0.0
+    stop: bool = False
+    goal_id: str = "default_goal"
+    sequence_id: int = 0
+
+
+@dataclass(frozen=True)
+class MotorStatusMessage:
+    state: str
+    mode: str
+    applied: bool
+    brake: bool
+    emergency_stop: bool
+    target_cell: Optional[GridCell] = None
+    applied_forward_speed: float = 0.0
+    applied_turn_rate: float = 0.0
+    left_wheel_speed: float = 0.0
+    right_wheel_speed: float = 0.0
+    goal_id: str = "default_goal"
+    sequence_id: int = 0
+    detail: str = ""
+
+
+@dataclass(frozen=True)
+class MissionStateMessage:
+    state: str
+    detail: str
+    goal_id: str = "default_goal"
+    planner_state: str = ""
+    navigation_state: str = ""
+    motor_mode: str = ""
+    motor_state: str = ""
+    emergency_stop: bool = False
 
 
 @dataclass(frozen=True)

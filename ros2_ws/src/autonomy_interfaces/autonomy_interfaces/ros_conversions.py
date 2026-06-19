@@ -4,11 +4,15 @@ from dataclasses import dataclass
 
 from .contracts import (
     MissionGoalMessage,
+    MissionStateMessage,
+    MotionCommandMessage,
+    MotorStatusMessage,
     NavigationStatusMessage,
     OccupancyGridMessage,
     PlannedPathMessage,
     PlannerStatusMessage,
     ReplanRequestMessage,
+    SensorObservationMessage,
 )
 
 
@@ -199,4 +203,128 @@ def from_ros_replan_request(message) -> ReplanRequestMessage:
         current_cell=current_cell,
         goal_id=message.goal_id,
         occupancy_revision=message.occupancy_revision,
+    )
+
+
+def to_ros_sensor_observation(message: SensorObservationMessage):
+    _require_ros_messages()
+    from autonomy_msgs.msg import GridCell, SensorObservation
+
+    ros_msg = SensorObservation()
+    ros_msg.sensor_type = message.sensor_type
+    ros_msg.detected_cells = [GridCell(row=row, col=col) for row, col in message.detected_cells]
+    ros_msg.source_map = message.source_map
+    ros_msg.sequence_id = message.sequence_id
+    return ros_msg
+
+
+def from_ros_sensor_observation(message) -> SensorObservationMessage:
+    return SensorObservationMessage(
+        sensor_type=message.sensor_type,
+        detected_cells=[(cell.row, cell.col) for cell in message.detected_cells],
+        source_map=message.source_map,
+        sequence_id=message.sequence_id,
+    )
+
+
+def to_ros_motion_command(message: MotionCommandMessage):
+    _require_ros_messages()
+    from autonomy_msgs.msg import MotionCommand
+
+    ros_msg = MotionCommand()
+    ros_msg.command_type = message.command_type
+    ros_msg.has_target_cell = message.target_cell is not None
+    if message.target_cell is not None:
+        ros_msg.target_row = message.target_cell[0]
+        ros_msg.target_col = message.target_cell[1]
+    ros_msg.linear_velocity = float(message.linear_velocity)
+    ros_msg.angular_velocity = float(message.angular_velocity)
+    ros_msg.stop = message.stop
+    ros_msg.goal_id = message.goal_id
+    ros_msg.sequence_id = message.sequence_id
+    return ros_msg
+
+
+def from_ros_motion_command(message) -> MotionCommandMessage:
+    target_cell = (message.target_row, message.target_col) if message.has_target_cell else None
+    return MotionCommandMessage(
+        command_type=message.command_type,
+        target_cell=target_cell,
+        linear_velocity=message.linear_velocity,
+        angular_velocity=message.angular_velocity,
+        stop=message.stop,
+        goal_id=message.goal_id,
+        sequence_id=message.sequence_id,
+    )
+
+
+def to_ros_motor_status(message: MotorStatusMessage):
+    _require_ros_messages()
+    from autonomy_msgs.msg import MotorStatus
+
+    ros_msg = MotorStatus()
+    ros_msg.state = message.state
+    ros_msg.mode = message.mode
+    ros_msg.applied = message.applied
+    ros_msg.brake = message.brake
+    ros_msg.emergency_stop = message.emergency_stop
+    ros_msg.has_target_cell = message.target_cell is not None
+    if message.target_cell is not None:
+        ros_msg.target_row = message.target_cell[0]
+        ros_msg.target_col = message.target_cell[1]
+    ros_msg.applied_forward_speed = float(message.applied_forward_speed)
+    ros_msg.applied_turn_rate = float(message.applied_turn_rate)
+    ros_msg.left_wheel_speed = float(message.left_wheel_speed)
+    ros_msg.right_wheel_speed = float(message.right_wheel_speed)
+    ros_msg.goal_id = message.goal_id
+    ros_msg.sequence_id = message.sequence_id
+    ros_msg.detail = message.detail
+    return ros_msg
+
+
+def from_ros_motor_status(message) -> MotorStatusMessage:
+    target_cell = (message.target_row, message.target_col) if message.has_target_cell else None
+    return MotorStatusMessage(
+        state=message.state,
+        mode=message.mode,
+        applied=message.applied,
+        brake=message.brake,
+        emergency_stop=message.emergency_stop,
+        target_cell=target_cell,
+        applied_forward_speed=message.applied_forward_speed,
+        applied_turn_rate=message.applied_turn_rate,
+        left_wheel_speed=message.left_wheel_speed,
+        right_wheel_speed=message.right_wheel_speed,
+        goal_id=message.goal_id,
+        sequence_id=message.sequence_id,
+        detail=message.detail,
+    )
+
+
+def to_ros_mission_state(message: MissionStateMessage):
+    _require_ros_messages()
+    from autonomy_msgs.msg import MissionState
+
+    ros_msg = MissionState()
+    ros_msg.state = message.state
+    ros_msg.detail = message.detail
+    ros_msg.goal_id = message.goal_id
+    ros_msg.planner_state = message.planner_state
+    ros_msg.navigation_state = message.navigation_state
+    ros_msg.motor_mode = message.motor_mode
+    ros_msg.motor_state = message.motor_state
+    ros_msg.emergency_stop = message.emergency_stop
+    return ros_msg
+
+
+def from_ros_mission_state(message) -> MissionStateMessage:
+    return MissionStateMessage(
+        state=message.state,
+        detail=message.detail,
+        goal_id=message.goal_id,
+        planner_state=message.planner_state,
+        navigation_state=message.navigation_state,
+        motor_mode=message.motor_mode,
+        motor_state=message.motor_state,
+        emergency_stop=message.emergency_stop,
     )

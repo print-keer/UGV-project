@@ -21,7 +21,7 @@ setup(
     entry_points={
         "console_scripts": [
             "navigation_node = navigation.navigation_node:main",
+            "motion_adapter_node = navigation.motion_adapter_node:main",
         ]
     },
 )
-

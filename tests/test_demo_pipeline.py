@@ -22,7 +22,11 @@ class DemoPipelineTests(unittest.TestCase):
         self.assertTrue(all("path_found" in report for report in reports))
         self.assertTrue(all(report["path_found"] for report in reports))
         self.assertTrue(all(report["planner_state"] == "success" for report in reports))
-        self.assertTrue(all(report["navigation_state"] == "following_path" for report in reports))
+        self.assertTrue(all(report["navigation_state"] == "reached_goal" for report in reports))
+        self.assertTrue(all(report["reached_goal"] for report in reports))
+        self.assertTrue(all(report["progress_steps"] >= 1 for report in reports))
+        self.assertTrue(all(report["motor_status_count"] >= 1 for report in reports))
+        self.assertTrue(all("applied" in report["motor_states"] for report in reports))
 
     def test_topic_demo_exercises_replanning_flow(self) -> None:
         reports = run_topic_demo()
@@ -30,6 +34,8 @@ class DemoPipelineTests(unittest.TestCase):
         self.assertGreaterEqual(len(reports), 2)
         self.assertTrue(all(report["replanned"] for report in reports))
         self.assertTrue(all(report["final_revision"] == 1 for report in reports))
+        self.assertTrue(all(not report["final_reached_goal"] for report in reports))
+        self.assertTrue(all(report["final_motor_status_count"] >= 1 for report in reports))
         self.assertTrue(
             all("/navigation/replan_request" in report["published_topics"] for report in reports)
         )
@@ -40,6 +46,7 @@ class DemoPipelineTests(unittest.TestCase):
         self.assertGreaterEqual(len(reports), 1)
         self.assertTrue(all(report["total_replans"] >= 1 for report in reports))
         self.assertTrue(all(len(report["revisions"]) >= 2 for report in reports))
+        self.assertTrue(all(len(report["progress_steps"]) == len(report["revisions"]) for report in reports))
 
 
 

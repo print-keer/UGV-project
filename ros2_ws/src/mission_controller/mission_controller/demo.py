@@ -41,6 +41,11 @@ def run_demo() -> List[dict]:
                 "planner_state": execution.planner_status.state,
                 "navigation_state": execution.navigation_status.state,
                 "navigation_message": execution.navigation_status.message,
+                "progress_steps": len(execution.navigation_execution.steps),
+                "reached_goal": execution.navigation_execution.reached_goal,
+                "motor_status_count": len(execution.motor_statuses),
+                "motor_states": [status.state for status in execution.motor_statuses],
+                "motor_modes": [status.mode for status in execution.motor_statuses],
                 "replan_reason": (
                     execution.replan_request.reason if execution.replan_request else None
                 ),
@@ -80,6 +85,8 @@ def run_topic_demo() -> List[dict]:
                 "initial_revision": topic_execution.initial_execution.occupancy_grid.revision,
                 "final_revision": topic_execution.final_execution.occupancy_grid.revision,
                 "final_path_found": topic_execution.final_execution.planned_path.path_found,
+                "final_reached_goal": topic_execution.final_execution.navigation_execution.reached_goal,
+                "final_motor_status_count": len(topic_execution.final_execution.motor_statuses),
                 "published_topics": topic_execution.published_topics,
             }
         )
@@ -104,6 +111,8 @@ def run_dynamic_demo() -> List[dict]:
                 "total_replans": dynamic_execution.total_replans,
                 "revisions": [step.occupancy_revision for step in dynamic_execution.steps],
                 "path_lengths": [len(step.path) for step in dynamic_execution.steps],
+                "progress_steps": [step.progress_steps for step in dynamic_execution.steps],
+                "reached_goal_flags": [step.reached_goal for step in dynamic_execution.steps],
                 "applied_obstacles": [
                     step.applied_obstacle for step in dynamic_execution.steps if step.applied_obstacle
                 ],
