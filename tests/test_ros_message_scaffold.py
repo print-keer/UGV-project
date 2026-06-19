@@ -25,6 +25,10 @@ class RosMessageScaffoldTests(unittest.TestCase):
         self.assertTrue((package_root / "msg" / "PlannerStatus.msg").exists())
         self.assertTrue((package_root / "msg" / "NavigationStatus.msg").exists())
         self.assertTrue((package_root / "msg" / "ReplanRequest.msg").exists())
+        self.assertTrue((package_root / "msg" / "SensorObservation.msg").exists())
+        self.assertTrue((package_root / "msg" / "MotionCommand.msg").exists())
+        self.assertTrue((package_root / "msg" / "MotorStatus.msg").exists())
+        self.assertTrue((package_root / "msg" / "MissionState.msg").exists())
 
     def test_ros_message_support_check_is_safe_without_generated_msgs(self) -> None:
         support = get_ros_message_support()

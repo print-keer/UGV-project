@@ -16,6 +16,10 @@ set(msg_files
   "msg/PlannerStatus.msg"
   "msg/NavigationStatus.msg"
   "msg/ReplanRequest.msg"
+  "msg/SensorObservation.msg"
+  "msg/MotionCommand.msg"
+  "msg/MotorStatus.msg"
+  "msg/MissionState.msg"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
@@ -24,4 +28,3 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 
 ament_export_dependencies(rosidl_default_runtime)
 ament_package()
-

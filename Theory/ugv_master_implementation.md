@@ -983,23 +983,33 @@ Fallback:
 
 # 36. RECOMMENDED TEAM DIVISION
 
-## AI Team
+## Autonomy Software Team
 Responsible for:
-- Dataset
-- Training
-- Detection
+- ROS2 architecture
+- mapping
+- path planning
+- navigation
+- sensor-ingestion code
+- sensor fusion
+- mission logic
+- hardware-facing autonomy software integration
 
-## Robotics Team
+## AI & Vision Team
 Responsible for:
-- Sensors
-- ROS2
-- Navigation
+- dataset
+- training
+- detection
+- threat classification
+- camera software pipeline
+- AI result publishing
 
-## Systems Team
+## Hardware Enablement Team
 Responsible for:
-- Integration
-- Optimization
-- Deployment
+- Raspberry Pi bring-up
+- sensor and motor mounting
+- wiring and power validation
+- physical platform readiness
+- assembly documentation
 
 ---
 
@@ -1095,4 +1105,3 @@ If implemented correctly, this architecture can evolve into:
 - Search-and-rescue robot
 - Smart tactical ground system
 - Multi-agent autonomous fleet
-

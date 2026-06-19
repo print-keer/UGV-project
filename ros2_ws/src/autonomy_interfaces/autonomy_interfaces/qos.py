@@ -14,6 +14,7 @@ def build_topic_qos(topic: str):
 
     transient_topics = {
         "/mission/goal",
+        "/mission/state",
         "/mapping/occupancy_grid",
         "/planner/path",
         "/planner/status",
@@ -32,4 +33,3 @@ def build_topic_qos(topic: str):
         history=HistoryPolicy.KEEP_LAST,
         depth=10,
     )
-

@@ -6,11 +6,15 @@ from typing import Any, Type, TypeVar
 
 from .contracts import (
     MissionGoalMessage,
+    MissionStateMessage,
+    MotionCommandMessage,
+    MotorStatusMessage,
     NavigationStatusMessage,
     OccupancyGridMessage,
     PlannedPathMessage,
     PlannerStatusMessage,
     ReplanRequestMessage,
+    SensorObservationMessage,
 )
 
 T = TypeVar("T")
@@ -34,6 +38,12 @@ def deserialize_message(payload: str, message_type: Type[T]) -> T:
         data["current_cell"] = tuple(data["current_cell"])
     if message_type is ReplanRequestMessage and data.get("current_cell") is not None:
         data["current_cell"] = tuple(data["current_cell"])
+    if message_type is SensorObservationMessage:
+        data["detected_cells"] = [tuple(item) for item in data["detected_cells"]]
+    if message_type is MotionCommandMessage and data.get("target_cell") is not None:
+        data["target_cell"] = tuple(data["target_cell"])
+    if message_type is MotorStatusMessage and data.get("target_cell") is not None:
+        data["target_cell"] = tuple(data["target_cell"])
     if message_type is PlannerStatusMessage:
         if data.get("start_cell") is not None:
             data["start_cell"] = tuple(data["start_cell"])
@@ -50,6 +60,11 @@ def decode_for_topic(topic: str, payload: str) -> Any:
         "/planner/status": PlannerStatusMessage,
         "/navigation/status": NavigationStatusMessage,
         "/navigation/replan_request": ReplanRequestMessage,
+        "/sensors/lidar_obstacles": SensorObservationMessage,
+        "/sensors/ultrasonic_obstacles": SensorObservationMessage,
+        "/motion/command": MotionCommandMessage,
+        "/motor/status": MotorStatusMessage,
+        "/mission/state": MissionStateMessage,
     }
     message_type = topic_map[topic]
     return deserialize_message(payload, message_type)

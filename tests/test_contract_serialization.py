@@ -12,11 +12,15 @@ for package_dir in src_root.iterdir():
 
 from autonomy_interfaces.contracts import (
     MissionGoalMessage,
+    MissionStateMessage,
+    MotionCommandMessage,
+    MotorStatusMessage,
     NavigationStatusMessage,
     OccupancyGridMessage,
     PlannedPathMessage,
     PlannerStatusMessage,
     ReplanRequestMessage,
+    SensorObservationMessage,
 )
 from autonomy_interfaces.serialization import deserialize_message, serialize_message
 
@@ -80,6 +84,74 @@ class ContractSerializationTests(unittest.TestCase):
         self.assertEqual(
             deserialize_message(serialize_message(replan_request), ReplanRequestMessage),
             replan_request,
+        )
+
+    def test_sensor_observation_round_trip(self) -> None:
+        observation = SensorObservationMessage(
+            sensor_type="lidar",
+            detected_cells=[(1, 2), (2, 2)],
+            source_map="unit_map",
+            sequence_id=4,
+        )
+
+        self.assertEqual(
+            deserialize_message(serialize_message(observation), SensorObservationMessage),
+            observation,
+        )
+
+    def test_motion_command_round_trip(self) -> None:
+        command = MotionCommandMessage(
+            command_type="step_to_cell",
+            target_cell=(2, 3),
+            linear_velocity=0.5,
+            angular_velocity=0.0,
+            stop=False,
+            goal_id="goal_motion",
+            sequence_id=6,
+        )
+
+        self.assertEqual(
+            deserialize_message(serialize_message(command), MotionCommandMessage),
+            command,
+        )
+
+    def test_motor_status_round_trip(self) -> None:
+        status = MotorStatusMessage(
+            state="applied",
+            mode="track_cell",
+            applied=True,
+            brake=False,
+            emergency_stop=False,
+            target_cell=(2, 3),
+            applied_forward_speed=0.4,
+            applied_turn_rate=0.1,
+            left_wheel_speed=0.38,
+            right_wheel_speed=0.42,
+            goal_id="goal_motor",
+            sequence_id=7,
+            detail="Stub driver applied mode=track_cell.",
+        )
+
+        self.assertEqual(
+            deserialize_message(serialize_message(status), MotorStatusMessage),
+            status,
+        )
+
+    def test_mission_state_round_trip(self) -> None:
+        state = MissionStateMessage(
+            state="navigating",
+            detail="Motor layer accepted movement command.",
+            goal_id="goal_state",
+            planner_state="success",
+            navigation_state="following_path",
+            motor_mode="track_cell",
+            motor_state="applied",
+            emergency_stop=False,
+        )
+
+        self.assertEqual(
+            deserialize_message(serialize_message(state), MissionStateMessage),
+            state,
         )
 
 
