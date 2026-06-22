@@ -18,17 +18,21 @@ validation and then expanding toward ROS2 integration and physical deployment.
 
 ## Current milestone
 
-The current repo includes the basic shared structure plus the Person 1
-navigation foundation:
+The current repo includes the basic shared structure, the Person 1 navigation
+foundation, and the first Person 2 perception scaffold:
 
 - mock occupancy-grid maps
 - A* shortest-path planner
 - ROS2 package scaffolding for mapping, planning, navigation, and mission flow
+- pure Python inference and threat-classification helpers
+- optional runtime image inference path for OpenCV and YOLO
+- ROS2 package scaffolding for `vision` and `threat_detection`
 - simulation demo for sample maps
 - automated baseline tests
 
-This milestone deliberately does not include live sensors, motors, AI
-inference, or threat-aware route weighting yet.
+This milestone deliberately does not include live sensors, motors, live camera
+streaming between ROS nodes, custom ROS messages, or threat-aware route
+weighting yet.
 
 ## Recommended team ownership
 

@@ -1,0 +1,10 @@
+path: ai/dataset/raw/MVRSD_dataset/data
+train: images/train
+val: images/val
+
+names:
+  0: SMV
+  1: LMV
+  2: AFV
+  3: CV
+  4: MCV
