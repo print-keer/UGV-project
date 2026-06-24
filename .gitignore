@@ -1,3 +1,4 @@
+.DS_Store
 __pycache__/
 *.pyc
 *.pyo
@@ -13,4 +14,11 @@ dist/
 install/
 log/
 *.egg-info/
-
+.cache/
+.mplconfig/
+.yolo/
+ai/dataset/raw/
+ai/dataset/processed/
+ai/models/*.pt
+ai/models/runs/
+yolov8n.pt

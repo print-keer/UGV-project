@@ -26,8 +26,9 @@ The long-term architecture follows the theory documents already in the repo:
 
 ## Current repository status
 
-This first implementation milestone establishes the shared repo structure and
-Person 1 navigation foundation so the team can start working in parallel.
+The current repository now includes the shared scaffold, Person 1 navigation
+foundation, and the first Person 2 perception foundation so the team can keep
+working in parallel.
 
 Implemented now:
 
@@ -37,13 +38,21 @@ Implemented now:
 - A* shortest-path planning core
 - simulation-first planner demo
 - unit-tested baseline planner behavior
+- pure Python AI inference and threat-classification scaffolding
+- optional OpenCV and Ultralytics runtime inference path
+- ROS2 package scaffolding for vision and threat-detection nodes
 - starter docs for team onboarding
 
 Planned next:
 
 - richer ROS2 message flow between mapping and planning
+codex/person2-perception-foundation
+- real camera and YOLO integration for Person 2
+- Person 3 hardware interface pipeline
+=======
 - Person 2 AI perception pipeline
 - hardware-connected software integration
+main
 - threat-aware route scoring
 - simulation and hardware integration
 
@@ -78,4 +87,5 @@ The current planner core is plain Python so it can be tested without ROS2. The
 ROS2 package wrappers are scaffolded for ROS2 Humble with `rclpy`.
 
 See [docs/navigation_foundation.md](/D:/Projects/UGV_FINAL/UGV-project/docs/navigation_foundation.md) for setup,
-package roles, test commands, and demo usage.
+package roles, test commands, and demo usage. The Person 2 foundation is
+described in [docs/ai_foundation.md](/D:/Projects/UGV_FINAL/UGV-project/docs/ai_foundation.md).
