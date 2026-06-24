@@ -1,154 +1,191 @@
-# UGV TEAM-BASED IMPLEMENTATION WORKFLOW
+# UGV Team-Based Implementation Workflow
 
-# Military Grade Autonomous UGV — Distributed Execution Blueprint
+# Military Grade Autonomous UGV - Distributed Execution Blueprint
 
 ---
 
-# 1. DOCUMENT PURPOSE
+# 1. Document Purpose
 
-This document is designed for a 3-member engineering team building the UGV project collaboratively.
+This document defines how a 3-member team should split the UGV project so work
+can happen in parallel without confusion.
 
 The architecture is intentionally divided so that:
 
-- Each team member can independently clone the repository
-- Each member can work in parallel
+- each team member can independently clone the repository
+- each member can work in parallel
 - Codex can execute tasks based on PERSON tags
-- Integration conflicts are minimized
-- Development becomes modular and scalable
+- integration conflicts are minimized
+- development stays modular and scalable
 
-This workflow follows professional robotics engineering methodology.
+This workflow follows a practical robotics engineering approach for a student
+team building one shared system.
 
 ---
 
-# 2. TEAM STRUCTURE
+# 2. Team Structure
 
-## PERSON 1 — AUTONOMY & NAVIGATION ENGINEER
+## PERSON 1 - AUTONOMY, ROBOTICS SOFTWARE & INTEGRATION ENGINEER
 
 Responsible for:
+
 - ROS2 architecture
-- Path planning
-- Mapping
-- Navigation stack
-- Sensor fusion logic
-- Occupancy grid
+- path planning
+- mapping
+- navigation stack
+- occupancy grid logic
 - A* implementation
-- Threat-aware route selection
+- replanning logic
+- threat-aware route selection
+- LiDAR software integration
+- ultrasonic software integration
+- navigation-to-motion command interfaces
+- autonomy software integration across shared ROS2 topics
 
 Primary Domain:
-AUTONOMOUS MOVEMENT
+AUTONOMY SOFTWARE
 
 ---
 
-## PERSON 2 — AI & VISION ENGINEER
+## PERSON 2 - AI & VISION ENGINEER
 
 Responsible for:
-- Dataset creation
-- Object detection
+
+- dataset creation
+- object detection
 - YOLO training
-- Threat classification
-- Camera processing
-- Inference optimization
-- Alert logic
-- Detection pipeline
+- threat classification
+- camera software pipeline
+- inference optimization
+- alert logic
+- detection pipeline
+- AI ROS2 publishing interfaces
 
 Primary Domain:
 AI PERCEPTION SYSTEM
 
 ---
 
-## PERSON 3 — HARDWARE & EMBEDDED SYSTEMS ENGINEER
+## PERSON 3 - HARDWARE ASSEMBLY & PLATFORM ENABLEMENT
 
 Responsible for:
+
 - Raspberry Pi setup
-- Servo driver integration
-- Motor interfacing
-- Sensor wiring
-- LiDAR setup
-- Ultrasonic integration
-- Power systems
-- GPIO/I2C communication
-- Hardware debugging
+- physical chassis assembly
+- motor mounting
+- sensor mounting
+- sensor wiring
+- LiDAR mounting
+- ultrasonic mounting
+- camera mounting
+- power systems
+- Raspberry Pi bring-up
+- mechanical and electrical validation
+- hardware debugging support
+- assembly and wiring documentation
 
 Primary Domain:
-PHYSICAL SYSTEMS
+PHYSICAL PLATFORM READINESS
+
+Not responsible for:
+
+- ROS2 node implementation
+- LiDAR ROS2 software
+- ultrasonic ROS2 software
+- motor-control software
+- navigation code
+- AI inference code
 
 ---
 
-# 3. GLOBAL DEVELOPMENT STRATEGY
+# 3. Global Development Strategy
 
-## IMPORTANT RULE
+## Important Rule
 
-No member should directly modify another member's module unless integration phase begins.
+No member should directly modify another member's module unless the integration
+phase has begun.
 
 Each subsystem must:
 
-- Build independently
-- Run independently
-- Be testable independently
+- build independently
+- run independently
+- be testable independently
 
 Final integration happens only after module validation.
 
+Coding ownership should stay primarily with Person 1 and Person 2.
+Person 3 supports by making sure the real robot hardware is assembled, powered,
+mounted correctly, and ready for software hookup and testing.
+
 ---
 
-# 4. MASTER REPOSITORY STRUCTURE
+# 4. Master Repository Structure
 
 ```text
 UGV/
-│
-├── autonomy/
-├── ai/
-├── firmware/
-├── hardware/
-├── ros2_ws/
-├── simulation/
-├── configs/
-├── logs/
-├── tests/
-└── docs/
+|
+|-- autonomy/
+|-- ai/
+|-- firmware/
+|-- hardware/
+|-- ros2_ws/
+|-- simulation/
+|-- configs/
+|-- logs/
+|-- tests/
+`-- docs/
 ```
 
 ---
 
-# 5. PERSON 1 — COMPLETE IMPLEMENTATION ROADMAP
+# 5. PERSON 1 - Complete Implementation Roadmap
 
 # PERSON 1
-# ROLE: AUTONOMY & NAVIGATION ENGINEER
+# ROLE: AUTONOMY, ROBOTICS SOFTWARE & INTEGRATION ENGINEER
 
 ---
 
-# PERSON 1 — PRIMARY OBJECTIVE
+# PERSON 1 - Primary Objective
 
-Build the complete autonomous navigation stack.
+Build the complete robotics autonomy software stack.
 
 This includes:
 
-- Mapping
-- Navigation
-- Path planning
-- Route optimization
-- Collision prevention
-- Threat-aware routing
+- mapping
+- navigation
+- path planning
+- route optimization
+- collision prevention
+- threat-aware routing
+- LiDAR software ingestion
+- ultrasonic software ingestion
+- sensor fusion for navigation
+- hardware-facing software integration points
 
 ---
 
-# PERSON 1 — DIRECTORY OWNERSHIP
+# PERSON 1 - Directory Ownership
 
 ```text
 autonomy/
 ros2_ws/src/navigation/
 ros2_ws/src/path_planner/
 ros2_ws/src/mapping/
+ros2_ws/src/mission_controller/
+ros2_ws/src/autonomy_interfaces/
+ros2_ws/src/autonomy_msgs/
 simulation/
+configs/
+tests/
 ```
 
 ---
 
-# PERSON 1 — PHASE 1
-# ROS2 FOUNDATION SETUP
+# PERSON 1 - Phase 1
+# ROS2 Foundation Setup
 
 ## Tasks
 
-### Install:
+### Install
 
 ```bash
 sudo apt install ros-humble-desktop
@@ -164,8 +201,8 @@ colcon build
 
 ---
 
-# PERSON 1 — PHASE 2
-# CREATE NAVIGATION NODES
+# PERSON 1 - Phase 2
+# Create Navigation Nodes
 
 ## Required Nodes
 
@@ -179,12 +216,12 @@ colcon build
 
 ---
 
-# PERSON 1 — PHASE 3
-# OCCUPANCY GRID IMPLEMENTATION
+# PERSON 1 - Phase 3
+# Occupancy Grid Implementation
 
 ## Objective
 
-Convert LiDAR data into:
+Convert LiDAR and ultrasonic software inputs into:
 
 ```text
 0 = free
@@ -194,18 +231,16 @@ Convert LiDAR data into:
 
 ---
 
-# PERSON 1 — PHASE 4
-# A* PATH PLANNING
+# PERSON 1 - Phase 4
+# A* Path Planning
 
 ## Objective
 
 Implement:
 
-- Multiple path generation
-- Shortest path selection
-- Dynamic route updates
-
----
+- multiple path generation
+- shortest path selection
+- dynamic route updates
 
 ## Required Features
 
@@ -214,8 +249,6 @@ Implement:
 ```text
 Path Cost = Distance + Threat Weight
 ```
-
----
 
 ## Threat Weights
 
@@ -227,36 +260,37 @@ Unknown = 50
 
 ---
 
-# PERSON 1 — PHASE 5
-# NAVIGATION EXECUTION
+# PERSON 1 - Phase 5
+# Navigation Execution & Robotics Control Handoff
 
 ## Objectives
 
-- Autonomous movement
-- Turning logic
-- Path following
-- Collision prevention
-- Goal completion
+- autonomous movement logic
+- turning logic
+- path following
+- collision prevention
+- goal completion
+- motion-command publishing contract
 
 ---
 
-# PERSON 1 — PHASE 6
-# SENSOR FUSION
+# PERSON 1 - Phase 6
+# Sensor Fusion
 
 ## Objective
 
 Combine:
 
 - LiDAR
-- Ultrasonic
+- ultrasonic
 - AI detection results
 
 into a unified environment model.
 
 ---
 
-# PERSON 1 — PHASE 7
-# MAP TESTING
+# PERSON 1 - Phase 7
+# Map Testing
 
 ## MAP 1
 Single shortest path.
@@ -269,20 +303,21 @@ Dual shortest path + threat-aware routing.
 
 ---
 
-# PERSON 1 — FINAL DELIVERABLES
+# PERSON 1 - Final Deliverables
 
 ## Must Deliver
 
-- Functional ROS2 navigation system
+- functional ROS2 autonomy software system
 - A* planner
-- Occupancy mapping
-- Sensor fusion engine
-- Threat-aware path planning
-- Mission completion logic
+- occupancy mapping
+- sensor fusion engine
+- threat-aware path planning
+- mission completion logic
+- hardware-facing navigation interfaces
 
 ---
 
-# PERSON 1 — CODEX EXECUTION PROMPTS
+# PERSON 1 - Codex Execution Prompts
 
 ## Prompt 1
 
@@ -291,16 +326,12 @@ PERSON1_TASK_01:
 Setup ROS2 Humble workspace for UGV autonomy architecture with modular navigation nodes.
 ```
 
----
-
 ## Prompt 2
 
 ```text
 PERSON1_TASK_02:
-Implement occupancy grid mapping using LiDAR sensor data in ROS2.
+Implement occupancy grid mapping using LiDAR and ultrasonic sensor data in ROS2.
 ```
-
----
 
 ## Prompt 3
 
@@ -309,16 +340,12 @@ PERSON1_TASK_03:
 Implement A* shortest path planner with support for dynamic threat-aware path weighting.
 ```
 
----
-
 ## Prompt 4
 
 ```text
 PERSON1_TASK_04:
 Create autonomous navigation node capable of movement toward goal coordinates while avoiding mapped obstacles.
 ```
-
----
 
 ## Prompt 5
 
@@ -329,28 +356,29 @@ Integrate sensor fusion system combining LiDAR, ultrasonic, and AI detection out
 
 ---
 
-# 6. PERSON 2 — COMPLETE IMPLEMENTATION ROADMAP
+# 6. PERSON 2 - Complete Implementation Roadmap
 
 # PERSON 2
 # ROLE: AI & VISION ENGINEER
 
 ---
 
-# PERSON 2 — PRIMARY OBJECTIVE
+# PERSON 2 - Primary Objective
 
 Build the complete AI perception stack.
 
 This includes:
 
-- Object detection
-- Harmful/harmless classification
-- Real-time inference
-- Alert generation
-- Detection optimization
+- object detection
+- harmful/harmless classification
+- real-time inference
+- alert generation
+- detection optimization
+- camera ROS2/software pipeline
 
 ---
 
-# PERSON 2 — DIRECTORY OWNERSHIP
+# PERSON 2 - Directory Ownership
 
 ```text
 ai/
@@ -358,14 +386,16 @@ ros2_ws/src/vision/
 ros2_ws/src/threat_detection/
 models/
 dataset/
+configs/
+tests/
 ```
 
 ---
 
-# PERSON 2 — PHASE 1
-# AI ENVIRONMENT SETUP
+# PERSON 2 - Phase 1
+# AI Environment Setup
 
-## Install:
+## Install
 
 ```bash
 pip install ultralytics
@@ -375,46 +405,42 @@ pip install torch torchvision
 
 ---
 
-# PERSON 2 — PHASE 2
-# DATASET COLLECTION
+# PERSON 2 - Phase 2
+# Dataset Collection
 
 ## Objective
 
 Capture:
 
-- Harmful objects
-- Harmless objects
-
----
+- harmful objects
+- harmless objects
 
 ## Dataset Requirements
 
 ### Harmful Examples
 
-- Weapon-like objects
-- Simulated explosives
-- Military props
-- Threat markers
+- weapon-like objects
+- simulated explosives
+- military props
+- threat markers
 
 ### Harmless Examples
 
-- Bottles
-- Boxes
-- Chairs
-- Civilian objects
+- bottles
+- boxes
+- chairs
+- civilian objects
 
 ---
 
-# PERSON 2 — PHASE 3
-# DATA LABELING
+# PERSON 2 - Phase 3
+# Data Labeling
 
 ## Tool
 
 Use:
 
 - LabelImg
-
----
 
 ## Labels
 
@@ -425,16 +451,14 @@ harmless
 
 ---
 
-# PERSON 2 — PHASE 4
-# YOLOv8 TRAINING
+# PERSON 2 - Phase 4
+# YOLOv8 Training
 
 ## Recommended Model
 
 ```text
 YOLOv8n
 ```
-
----
 
 ## Training Command
 
@@ -444,8 +468,8 @@ yolo task=detect mode=train model=yolov8n.pt data=data.yaml epochs=100 imgsz=640
 
 ---
 
-# PERSON 2 — PHASE 5
-# MODEL OPTIMIZATION
+# PERSON 2 - Phase 5
+# Model Optimization
 
 ## Convert to ONNX
 
@@ -455,25 +479,26 @@ yolo export model=best.pt format=onnx
 
 ---
 
-# PERSON 2 — PHASE 6
-# REAL-TIME INFERENCE PIPELINE
+# PERSON 2 - Phase 6
+# Real-Time Inference Pipeline
 
 ## Objectives
 
-- Camera streaming
-- Real-time inference
-- Bounding box generation
-- Threat classification
+- camera streaming
+- real-time inference
+- bounding box generation
+- threat classification
 - ROS2 publishing
+- detection message contracts for navigation integration
 
 ---
 
-# PERSON 2 — PHASE 7
-# ALERT SYSTEM
+# PERSON 2 - Phase 7
+# Alert System
 
 ## Required Alerts
 
-### If harmful object detected:
+### If harmful object detected
 
 ```text
 [ALERT] Harmful object detected.
@@ -482,32 +507,33 @@ Mission continuing.
 
 ---
 
-# PERSON 2 — PHASE 8
-# DETECTION OPTIMIZATION
+# PERSON 2 - Phase 8
+# Detection Optimization
 
 ## Goals
 
-- Increase FPS
-- Reduce latency
-- Lower CPU usage
-- Optimize inference
+- increase FPS
+- reduce latency
+- lower CPU usage
+- optimize inference
 
 ---
 
-# PERSON 2 — FINAL DELIVERABLES
+# PERSON 2 - Final Deliverables
 
 ## Must Deliver
 
-- Custom dataset
-- Trained YOLO model
-- Real-time inference system
-- Threat classification system
-- Alert system
+- custom dataset
+- trained YOLO model
+- real-time inference system
+- threat classification system
+- alert system
 - ROS2 AI detection node
+- camera-to-AI software pipeline
 
 ---
 
-# PERSON 2 — CODEX EXECUTION PROMPTS
+# PERSON 2 - Codex Execution Prompts
 
 ## Prompt 1
 
@@ -516,16 +542,12 @@ PERSON2_TASK_01:
 Setup AI training environment for YOLOv8 harmful vs harmless object detection.
 ```
 
----
-
 ## Prompt 2
 
 ```text
 PERSON2_TASK_02:
 Create dataset structure and training pipeline for binary threat classification.
 ```
-
----
 
 ## Prompt 3
 
@@ -534,16 +556,12 @@ PERSON2_TASK_03:
 Implement real-time OpenCV camera pipeline integrated with YOLOv8 inference.
 ```
 
----
-
 ## Prompt 4
 
 ```text
 PERSON2_TASK_04:
 Build ROS2 vision node publishing harmful and harmless object detections.
 ```
-
----
 
 ## Prompt 5
 
@@ -554,50 +572,50 @@ Optimize YOLO inference pipeline for Raspberry Pi embedded deployment.
 
 ---
 
-# 7. PERSON 3 — COMPLETE IMPLEMENTATION ROADMAP
+# 7. PERSON 3 - Complete Implementation Roadmap
 
 # PERSON 3
-# ROLE: HARDWARE & EMBEDDED SYSTEMS ENGINEER
+# ROLE: HARDWARE ASSEMBLY & PLATFORM ENABLEMENT
 
 ---
 
-# PERSON 3 — PRIMARY OBJECTIVE
+# PERSON 3 - Primary Objective
 
-Build the complete physical UGV platform.
+Build and enable the physical UGV platform so the software team can connect
+real code to real hardware.
 
 This includes:
 
-- Wiring
-- Sensor integration
+- wiring
+- sensor mounting
 - Raspberry Pi configuration
-- Motor control
-- Power systems
-- Hardware reliability
+- motor mounting
+- power systems
+- hardware reliability
+- chassis readiness
 
 ---
 
-# PERSON 3 — DIRECTORY OWNERSHIP
+# PERSON 3 - Directory Ownership
 
 ```text
 firmware/
 hardware/
-ros2_ws/src/hardware_interface/
+docs/
 ```
 
 ---
 
-# PERSON 3 — PHASE 1
-# RASPBERRY PI SETUP
+# PERSON 3 - Phase 1
+# Raspberry Pi Setup
 
 ## Objectives
 
-- Install OS
-- Configure SSH
-- Configure I2C
-- Configure GPIO
-- Configure camera
-
----
+- install OS
+- configure SSH
+- configure I2C
+- configure GPIO
+- configure camera
 
 ## Enable Interfaces
 
@@ -607,103 +625,87 @@ sudo raspi-config
 
 Enable:
 
-- Camera
+- camera
 - I2C
 - SSH
 
 ---
 
-# PERSON 3 — PHASE 2
-# SERVO DRIVER INTEGRATION
-
-## Hardware
-
-- Waveshare Servo Driver HAT (B)
-
----
+# PERSON 3 - Phase 2
+# Sensor and Motor Mounting
 
 ## Objectives
 
-- PWM testing
-- Servo testing
-- Motor testing
-- Direction control
+- mount motor driver hardware
+- mount motors securely
+- verify cable routing
+- verify connector fit and board placement
 
 ---
 
-# PERSON 3 — PHASE 3
-# LiDAR INTEGRATION
+# PERSON 3 - Phase 3
+# Sensor Enablement
 
 ## Objectives
 
-- LiDAR communication
-- Distance reading
-- ROS2 topic publishing
-- Sensor calibration
+- mount LiDAR
+- mount ultrasonic sensor
+- mount camera
+- verify electrical connectivity
+- verify devices are physically recognized by the Pi
 
 ---
 
-# PERSON 3 — PHASE 4
-# ULTRASONIC SENSOR INTEGRATION
+# PERSON 3 - Phase 4
+# Raspberry Pi Platform Bring-Up
 
 ## Objectives
 
-- Near obstacle detection
-- Emergency stop trigger
-- ROS2 communication
+- OS installation
+- SSH access
+- interface enablement
+- basic device checks
 
 ---
 
-# PERSON 3 — PHASE 5
-# CAMERA INTEGRATION
+# PERSON 3 - Phase 5
+# Power and Stability
 
 ## Objectives
 
-- 1080p stream validation
-- Day/night mode validation
-- OpenCV camera access
+- stable voltage
+- power distribution
+- thermal monitoring
+- battery management
 
 ---
 
-# PERSON 3 — PHASE 6
-# MOTOR CONTROL SYSTEM
+# PERSON 3 - Phase 6
+# Physical Validation Support
 
 ## Objectives
 
-- Forward movement
-- Reverse movement
-- Turning
-- Speed control
-- Emergency stop
+- help validate hardware with the software team
+- document pinouts and connections
+- report hardware constraints
+- support bench testing and troubleshooting
 
 ---
 
-# PERSON 3 — PHASE 7
-# POWER SYSTEM STABILIZATION
-
-## Objectives
-
-- Stable voltage
-- Power distribution
-- Thermal monitoring
-- Battery management
-
----
-
-# PERSON 3 — FINAL DELIVERABLES
+# PERSON 3 - Final Deliverables
 
 ## Must Deliver
 
-- Stable Raspberry Pi system
-- Functional sensors
-- Functional motors
-- ROS2 hardware interfaces
-- Reliable physical platform
-- Stable power architecture
+- stable Raspberry Pi system
+- functional sensors at the physical/electrical level
+- functional motors at the physical/electrical level
+- reliable physical platform
+- stable power architecture
+- assembly and wiring notes
 
 ---
 
-# PERSON 3 — CODEX EXECUTION PROMPTS
+# PERSON 3 - Codex Execution Prompts
 
 ## Prompt 1
 
@@ -712,60 +714,52 @@ PERSON3_TASK_01:
 Setup Raspberry Pi hardware environment for military-grade UGV system.
 ```
 
----
-
 ## Prompt 2
 
 ```text
 PERSON3_TASK_02:
-Integrate Waveshare Servo Driver HAT with Raspberry Pi using I2C communication.
+Assemble and wire the Waveshare Servo Driver HAT, motors, and power connections on the UGV platform.
 ```
-
----
 
 ## Prompt 3
 
 ```text
 PERSON3_TASK_03:
-Implement LiDAR and ultrasonic sensor ROS2 hardware interface nodes.
+Mount and enable LiDAR, ultrasonic, and camera hardware so the software team can consume them.
 ```
-
----
 
 ## Prompt 4
 
 ```text
 PERSON3_TASK_04:
-Create motor control firmware supporting forward, reverse, turning, and emergency stop.
+Validate motor and power wiring readiness for software-driven control testing.
 ```
-
----
 
 ## Prompt 5
 
 ```text
 PERSON3_TASK_05:
-Integrate Raspberry Pi camera system with OpenCV validation pipeline.
+Document the final hardware assembly, pin mapping, and bring-up checklist.
 ```
 
 ---
 
-# 8. INTEGRATION PHASE
+# 8. Integration Phase
 
-# CRITICAL PHASE
+# Critical Phase
 
-Integration begins ONLY after:
+Integration begins only after:
 
-- Person 1 validates navigation
-- Person 2 validates AI detection
-- Person 3 validates hardware systems
+- Person 1 validates navigation software
+- Person 2 validates AI detection software
+- Person 3 validates hardware readiness
 
 ---
 
-# 9. FINAL SYSTEM INTEGRATION ORDER
+# 9. Final System Integration Order
 
 ## Step 1
-Integrate hardware drivers.
+Integrate hardware-ready devices with software drivers.
 
 ## Step 2
 Integrate ROS2 communication.
@@ -790,15 +784,15 @@ Run physical map tests.
 
 ---
 
-# 10. MAP VALIDATION EXECUTION
+# 10. Map Validation Execution
 
 # MAP 1
 
 Expected:
 
-- Shortest path chosen
-- Harmless object detected
-- Goal reached
+- shortest path chosen
+- harmless object detected
+- goal reached
 
 ---
 
@@ -806,9 +800,9 @@ Expected:
 
 Expected:
 
-- Harmful object detected
-- Alert triggered
-- Goal reached
+- harmful object detected
+- alert triggered
+- goal reached
 
 ---
 
@@ -816,13 +810,13 @@ Expected:
 
 Expected:
 
-- Safer shortest path selected
-- Harmful path avoided
-- Goal reached
+- safer shortest path selected
+- harmful path avoided
+- goal reached
 
 ---
 
-# 11. GIT WORKFLOW STRATEGY
+# 11. Git Workflow Strategy
 
 ## Recommended Branches
 
@@ -830,123 +824,115 @@ Expected:
 main
 person1-navigation
 person2-ai
-person3-hardware
+person3-assembly
 integration
 ```
 
 ---
 
-# 12. COMMIT RULES
+# 12. Commit Rules
 
 ## Commit Format
 
 ```text
 [PERSON1] Added A* planner
 [PERSON2] Trained YOLOv8n model
-[PERSON3] Integrated LiDAR driver
+[PERSON3] Completed hardware assembly checklist
 ```
 
 ---
 
-# 13. DAILY WORKFLOW
+# 13. Daily Workflow
 
 ## Morning
 
-- Pull latest changes
-- Sync dependencies
-- Review integration blockers
+- pull latest changes
+- sync dependencies
+- review integration blockers
 
 ## During Work
 
-- Work only inside assigned directories
-- Push frequently
+- work only inside assigned directories
+- push frequently
 
 ## End of Day
 
-- Commit changes
-- Update progress log
-- Document issues
+- commit changes
+- update progress log
+- document issues
 
 ---
 
-# 14. CODING STANDARDS
+# 14. Coding Standards
 
 ## Python Standards
 
-- Modular functions
-- Type hints
+- modular functions
+- type hints
 - ROS2 logging
-- Exception handling
-- Config-driven architecture
+- exception handling
+- config-driven architecture
 
 ---
 
-# 15. TESTING REQUIREMENTS
+# 15. Testing Requirements
 
 ## Unit Testing
 
 Each module must be independently testable.
-
----
 
 ## Integration Testing
 
 Validate:
 
 - ROS communication
-- Sensor updates
+- sensor updates
 - AI detections
-- Navigation decisions
+- navigation decisions
 
 ---
 
-# 16. CRITICAL ENGINEERING RULES
+# 16. Critical Engineering Rules
 
-## NEVER:
+## Never
 
-- Hardcode sensor values
-- Mix AI and navigation logic in one file
-- Directly manipulate hardware inside AI modules
-- Block navigation during inference
+- hardcode sensor values
+- mix AI and navigation logic in one file
+- directly manipulate hardware inside AI modules
+- block navigation during inference
 
 ---
 
-# 17. FINAL TARGET ARCHITECTURE
+# 17. Final Target Architecture
 
 The final UGV system should function as:
 
-- Autonomous navigation platform
-- Threat-aware decision system
-- Real-time AI perception engine
-- Embedded robotics platform
-- Modular military-grade prototype
+- autonomous navigation platform
+- threat-aware decision system
+- real-time AI perception engine
+- physically stable robotics platform
+- modular prototype ready for further research
 
 ---
 
-# 18. FINAL SUCCESS CRITERIA
+# 18. Final Success Criteria
 
 Project is successful if:
 
 - UGV autonomously reaches target
-- Correctly identifies harmful/harmless objects
-- Avoids obstacles
-- Triggers alerts reliably
-- Selects safest shortest route
-- Operates continuously without crash
-- Maintains stable ROS2 communication
-- Performs real-time inference on embedded hardware
+- correctly identifies harmful/harmless objects
+- avoids obstacles
+- triggers alerts reliably
+- selects safest shortest route
+- operates continuously without crash
+- maintains stable ROS2 communication
+- performs real-time inference on embedded hardware
 
 ---
 
-# 19. FINAL ENGINEERING ADVICE
+# 19. Final Engineering Advice
 
-This project should not be approached like:
-
-A normal robotics college project.
-
-It should be approached like:
-
-A scalable autonomous systems engineering platform.
+This project should be approached like a scalable autonomous systems platform.
 
 The key to success is:
 
@@ -955,13 +941,3 @@ The key to success is:
 - clean interfaces
 - incremental validation
 - disciplined integration
-
-If implemented correctly, this architecture can evolve into:
-
-- tactical reconnaissance UGV
-- autonomous patrol platform
-- intelligent surveillance robot
-- defense research platform
-- swarm robotics system
-- AI-assisted autonomous military vehicle
-

@@ -1,0 +1,25 @@
+{
+  "name": "map_dynamic_escape",
+  "description": "Dynamic map that forces replanning as new obstacles appear along the preferred corridor.",
+  "start": [0, 0],
+  "goal": [4, 5],
+  "dynamic_obstacles": [
+    [0, 2],
+    [0, 3],
+    [2, 4]
+  ],
+  "lidar_observations": [
+    [[0, 4]],
+    [[1, 4]]
+  ],
+  "ultrasonic_observations": [
+    [[2, 5]]
+  ],
+  "grid": [
+    [0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0]
+  ]
+}

@@ -1,0 +1,11 @@
+string state
+string message
+string goal_id
+int32 visited_nodes
+bool has_start
+int32 start_row
+int32 start_col
+bool has_goal
+int32 goal_row
+int32 goal_col
+int32 occupancy_revision

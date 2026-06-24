@@ -3,7 +3,7 @@
 This repository is the shared engineering base for a modular autonomous
 Unmanned Ground Vehicle (UGV) prototype. The project is being developed as a
 multi-person system with separate workstreams for autonomy, AI perception, and
-hardware integration.
+hardware assembly and platform enablement.
 
 ## Project objective
 
@@ -46,19 +46,26 @@ Implemented now:
 Planned next:
 
 - richer ROS2 message flow between mapping and planning
+codex/person2-perception-foundation
 - real camera and YOLO integration for Person 2
 - Person 3 hardware interface pipeline
+=======
+- Person 2 AI perception pipeline
+- hardware-connected software integration
+main
 - threat-aware route scoring
 - simulation and hardware integration
 
 ## Team workstreams
 
-- Person 1: autonomy, mapping, path planning, navigation, mission logic
-- Person 2: dataset, training, inference, threat classification, alert logic
-- Person 3: Raspberry Pi, motors, LiDAR, ultrasonic, camera, hardware interface
+- Person 1: autonomy software, mapping, path planning, navigation, mission logic, robotics integration
+- Person 2: dataset, training, inference, threat classification, camera pipeline, alert logic
+- Person 3: Raspberry Pi bring-up, wiring, mounting, power, chassis assembly, hardware readiness
 
 A short collaboration guide is available in
 [docs/project_overview.md](/D:/Projects/UGV_FINAL/UGV-project/docs/project_overview.md).
+The updated execution roadmap is in
+[docs/revised_execution_plan.md](/D:/Projects/UGV_FINAL/UGV-project/docs/revised_execution_plan.md).
 
 ## Repository layout
 

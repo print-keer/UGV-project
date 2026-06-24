@@ -1,0 +1,19 @@
+MISSION_GOAL_TOPIC = "/mission/goal"
+MISSION_STATE_TOPIC = "/mission/state"
+OCCUPANCY_GRID_TOPIC = "/mapping/occupancy_grid"
+PLANNED_PATH_TOPIC = "/planner/path"
+PLANNER_STATUS_TOPIC = "/planner/status"
+NAVIGATION_STATUS_TOPIC = "/navigation/status"
+REPLAN_REQUEST_TOPIC = "/navigation/replan_request"
+MOTION_COMMAND_TOPIC = "/motion/command"
+MOTOR_STATUS_TOPIC = "/motor/status"
+VIZ_OCCUPANCY_GRID_TOPIC = "/viz/occupancy_grid"
+VIZ_PLANNED_PATH_TOPIC = "/viz/planned_path"
+VIZ_GOAL_TOPIC = "/viz/goal"
+VIZ_MARKERS_TOPIC = "/viz/navigation_markers"
+SIM_LIDAR_TOPIC = "/sensors/lidar_obstacles"
+SIM_ULTRASONIC_TOPIC = "/sensors/ultrasonic_obstacles"
+
+MISSION_GOAL_PERIOD_SEC = 2.0
+MAP_PUBLISH_PERIOD_SEC = 1.0
+MAP_ROTATION_PERIOD_SEC = 5.0

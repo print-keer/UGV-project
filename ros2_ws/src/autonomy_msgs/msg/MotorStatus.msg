@@ -1,0 +1,15 @@
+string state
+string mode
+bool applied
+bool brake
+bool emergency_stop
+bool has_target_cell
+int32 target_row
+int32 target_col
+float32 applied_forward_speed
+float32 applied_turn_rate
+float32 left_wheel_speed
+float32 right_wheel_speed
+string goal_id
+uint32 sequence_id
+string detail

@@ -11,6 +11,11 @@ setup(
     data_files=[
         ("share/ament_index/resource_index/packages", [f"resource/{package_name}"]),
         (f"share/{package_name}", ["package.xml"]),
+        (f"share/{package_name}/launch", ["launch/person1_stack.launch.py"]),
+        (f"share/{package_name}/launch", ["launch/person1_visualization.launch.py"]),
+        (f"share/{package_name}/launch", ["launch/person1_hardware_sensors.launch.py"]),
+        (f"share/{package_name}/launch", ["launch/person1_observe.launch.py"]),
+        (f"share/{package_name}/rviz", ["rviz/person1_navigation.rviz"]),
     ],
     install_requires=["setuptools"],
     zip_safe=True,
@@ -21,7 +26,9 @@ setup(
     entry_points={
         "console_scripts": [
             "mission_demo = mission_controller.demo:main",
+            "mission_controller_node = mission_controller.mission_controller_node:main",
+            "visualizer_node = mission_controller.visualizer_node:main",
+            "monitor_node = mission_controller.monitor_node:main",
         ]
     },
 )
-

@@ -3,6 +3,10 @@
   "description": "Obstacle corridor used to validate detours around blocked cells.",
   "start": [0, 0],
   "goal": [5, 5],
+  "dynamic_obstacles": [
+    [0, 2],
+    [2, 3]
+  ],
   "grid": [
     [0, 0, 0, 0, 0, 0],
     [1, 1, 1, 1, 1, 0],
@@ -12,4 +16,3 @@
     [0, 1, 1, 1, 1, 0]
   ]
 }
-
