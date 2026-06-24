@@ -9,11 +9,10 @@ from autonomy_interfaces.topic_transport import (
 from mission_controller.topics import SIM_LIDAR_TOPIC, SIM_ULTRASONIC_TOPIC
 
 from .sensor_projection import (
-    LidarProjectionConfig,
     UltrasonicProjectionConfig,
-    lidar_ranges_to_observation,
     ultrasonic_range_to_observation,
 )
+from .sensor_adapter_runtime import LidarAdapterRuntimeConfig, adapt_lidar_scan
 
 
 def lidar_adapter_main() -> None:
@@ -38,6 +37,8 @@ def lidar_adapter_main() -> None:
             self.declare_parameter("resolution_m", 1.0)
             self.declare_parameter("min_range_m", 0.05)
             self.declare_parameter("max_range_m", 8.0)
+            self.declare_parameter("scan_stride", 1)
+            self.declare_parameter("angle_offset_rad", 0.0)
             self.declare_parameter("source_map", "")
 
             input_topic = str(self.get_parameter("input_topic").value)
@@ -58,22 +59,23 @@ def lidar_adapter_main() -> None:
 
         def _on_scan(self, msg: "LaserScan") -> None:
             configured_max = float(self.get_parameter("max_range_m").value)
-            config = LidarProjectionConfig(
-                origin_cell=(
-                    int(self.get_parameter("origin_row").value),
-                    int(self.get_parameter("origin_col").value),
-                ),
+            config = LidarAdapterRuntimeConfig(
+                origin_row=int(self.get_parameter("origin_row").value),
+                origin_col=int(self.get_parameter("origin_col").value),
                 resolution_m=float(self.get_parameter("resolution_m").value),
-                angle_min_rad=float(msg.angle_min),
-                angle_increment_rad=float(msg.angle_increment),
                 min_range_m=float(self.get_parameter("min_range_m").value),
                 max_range_m=min(configured_max, float(msg.range_max) if msg.range_max > 0 else configured_max),
+                scan_stride=int(self.get_parameter("scan_stride").value),
+                angle_offset_rad=float(self.get_parameter("angle_offset_rad").value),
                 source_map=str(self.get_parameter("source_map").value),
             )
-            observation = lidar_ranges_to_observation(
+            observation = adapt_lidar_scan(
                 list(msg.ranges),
+                angle_min_rad=float(msg.angle_min),
+                angle_increment_rad=float(msg.angle_increment),
                 sequence_id=self.sequence_id,
                 config=config,
+                frame_id=str(msg.header.frame_id),
             )
             self.publisher.publish(
                 encode_topic_message(self.output_topic, observation, self.string_cls)

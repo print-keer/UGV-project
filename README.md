@@ -45,14 +45,11 @@ Implemented now:
 
 Planned next:
 
-- richer ROS2 message flow between mapping and planning
-codex/person2-perception-foundation
-- real camera and YOLO integration for Person 2
-- Person 3 hardware interface pipeline
-=======
-- Person 2 AI perception pipeline
-- hardware-connected software integration
-main
+- typed ROS2 message alignment between autonomy and perception
+- integration of AI detections into mission and navigation logic
+- live LiDAR and ultrasonic software integration for Person 1
+- real camera and trained-model runtime integration for Person 2
+- hardware-connected validation on the assembled robot
 - threat-aware route scoring
 - simulation and hardware integration
 
@@ -83,8 +80,9 @@ The updated execution roadmap is in
 
 ## Local development
 
-The current planner core is plain Python so it can be tested without ROS2. The
-ROS2 package wrappers are scaffolded for ROS2 Humble with `rclpy`.
+The current autonomy and AI foundation modules are largely plain Python so they
+can be tested without ROS2. The ROS2 package wrappers are scaffolded for ROS2
+Humble with `rclpy`.
 
 See [docs/navigation_foundation.md](/D:/Projects/UGV_FINAL/UGV-project/docs/navigation_foundation.md) for setup,
 package roles, test commands, and demo usage. The Person 2 foundation is

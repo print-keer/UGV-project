@@ -11,6 +11,13 @@ setup(
     data_files=[
         ("share/ament_index/resource_index/packages", [f"resource/{package_name}"]),
         (f"share/{package_name}", ["package.xml"]),
+        (
+            f"share/{package_name}/config",
+            [
+                "config/lidar_adapter_defaults.yaml",
+                "config/ultrasonic_adapter_defaults.yaml",
+            ],
+        ),
         (f"share/{package_name}/launch", ["launch/person1_stack.launch.py"]),
         (f"share/{package_name}/launch", ["launch/person1_visualization.launch.py"]),
         (f"share/{package_name}/launch", ["launch/person1_hardware_sensors.launch.py"]),

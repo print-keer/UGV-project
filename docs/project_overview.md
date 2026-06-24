@@ -19,7 +19,7 @@ validation and then expanding toward ROS2 integration and physical deployment.
 ## Current milestone
 
 The current repo includes the basic shared structure, the Person 1 navigation
-foundation, and the first Person 2 perception scaffold:
+foundation, and the first Person 2 perception foundation:
 
 - mock occupancy-grid maps
 - A* shortest-path planner
@@ -30,9 +30,18 @@ foundation, and the first Person 2 perception scaffold:
 - simulation demo for sample maps
 - automated baseline tests
 
-This milestone deliberately does not include live sensors, motors, live camera
-streaming between ROS nodes, custom ROS messages, or threat-aware route
-weighting yet.
+What this means in practice is:
+
+- Person 1 already has the movement-side software base
+- Person 2 already has the seeing-and-classifying software base
+- Person 3 can continue hardware preparation in parallel
+
+The biggest remaining milestone is software integration between those two code
+lanes so navigation can consume perception results during mission execution.
+
+The repo still does not fully include live sensors, motors, live camera
+streaming between ROS nodes, shared typed messages between autonomy and
+perception, or threat-aware route weighting yet.
 
 ## Recommended team ownership
 
@@ -59,12 +68,14 @@ mounting, and hardware readiness for software testing.
 - path-planning baseline: A*
 - map representation: occupancy grid with `0`, `1`, and `2`
 - simulation-first workflow before hardware testing
+- current perception transport: ROS2 JSON payloads over `std_msgs/String`
 - future integration point: threat-aware path selection with separate cost logic
 
 ## Useful starting points
 
 - [README.md](/D:/Projects/UGV_FINAL/UGV-project/README.md): project-level overview
 - [revised_execution_plan.md](/D:/Projects/UGV_FINAL/UGV-project/docs/revised_execution_plan.md): updated role split, phases, dependencies, and handoffs
-- [navigation_foundation.md](/D:/Projects/UGV_FINAL/UGV-project/docs/navigation_foundation.md): current milestone details
+- [navigation_foundation.md](/D:/Projects/UGV_FINAL/UGV-project/docs/navigation_foundation.md): Person 1 autonomy details
+- [ai_foundation.md](/D:/Projects/UGV_FINAL/UGV-project/docs/ai_foundation.md): Person 2 perception details
 - [ugv_master_implementation.md](/D:/Projects/UGV_FINAL/UGV-project/Theory/ugv_master_implementation.md): master project theory
 - [ugv_work_division.md](/D:/Projects/UGV_FINAL/UGV-project/Theory/ugv_work_division.md): team-based work split
