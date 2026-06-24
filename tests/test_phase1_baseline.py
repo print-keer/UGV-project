@@ -42,6 +42,24 @@ class Phase1BaselineTests(unittest.TestCase):
             / "person1_observe.launch.py"
         )
         self.assertTrue(observe_launch_path.exists())
+        lidar_config_path = (
+            repo_root
+            / "ros2_ws"
+            / "src"
+            / "mission_controller"
+            / "config"
+            / "lidar_adapter_defaults.yaml"
+        )
+        self.assertTrue(lidar_config_path.exists())
+        ultrasonic_config_path = (
+            repo_root
+            / "ros2_ws"
+            / "src"
+            / "mission_controller"
+            / "config"
+            / "ultrasonic_adapter_defaults.yaml"
+        )
+        self.assertTrue(ultrasonic_config_path.exists())
         rviz_config_path = (
             repo_root
             / "ros2_ws"

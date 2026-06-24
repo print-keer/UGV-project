@@ -203,6 +203,23 @@ Recommended hardware-facing launch on a ROS2 Humble machine:
 ros2 launch mission_controller person1_hardware_sensors.launch.py
 ```
 
+You can now also override the real hardware input topics at launch time, for example:
+
+```bash
+ros2 launch mission_controller person1_hardware_sensors.launch.py scan_topic:=/scan ultrasonic_topic:=/ultrasonic/range
+```
+
+Default adapter parameter files are now included for:
+
+- `lidar_adapter_defaults.yaml`
+- `ultrasonic_adapter_defaults.yaml`
+
+The LiDAR adapter also now supports:
+
+- scan decimation with `scan_stride`
+- angle offset correction with `angle_offset_rad`
+- automatic fallback to the incoming scan `frame_id` when `source_map` is left empty
+
 ## Phase 8 motion-command handoff
 
 The navigation side now includes a first motion-command seam for Person 1:

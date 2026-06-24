@@ -74,6 +74,6 @@ python -m ai.training.train --preset mvrsd-multiclass --print-command-only
 
 1. Replace JSON-over-String topics with custom ROS2 message definitions.
 2. Train a first YOLO model from the prepared MVRSD dataset.
-3. Connect threat output into the navigation team’s future threat-cost logic.
+3. Connect threat output into the navigation team's future threat-cost logic.
 4. Add live multi-frame camera streaming and throttling controls.
 5. Add Raspberry Pi focused optimization and deployment notes.
